@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Log</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<!-- Screen: Start -->
+<div id="scr-start" class="screen active">
+  <div class="hdr"><h1>Field Log</h1></div>
+  <div id="banner-active" style="display:none">
+    <div class="pill-active">
+      <div class="pulse"></div>
+      <span>Session in progress — go to Active tab</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Session Info</div>
+    <div class="fg">
+      <label>Date</label>
+      <input type="date" id="inp-date">
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Start Time</label>
+        <input type="time" id="inp-stime">
+      </div>
+      <div class="fg">
+        <label>Area</label>
+        <input type="text" id="inp-area" placeholder="e.g. Downtown, Park">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Time Slot</label>
+        <select id="inp-tslot">
+          <option value="Noon">Noon (12–15)</option>
+          <option value="Afternoon">Afternoon (15–18)</option>
+          <option value="Evening" selected>Evening (18–21)</option>
+          <option value="Night">Night (21+)</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Weather</label>
+        <select id="inp-weather">
+          <option value="Sunny">&#9728; Sunny</option>
+          <option value="Cloudy">&#9729; Cloudy</option>
+          <option value="Rain">&#127783; Rain</option>
+          <option value="Snow">&#10052; Snow</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Condition (1–5)</label>
+      <div class="rating-row" id="r-cond">
+        <button class="rb" onclick="setRating('cond',1)">1</button>
+        <button class="rb" onclick="setRating('cond',2)">2</button>
+        <button class="rb" onclick="setRating('cond',3)">3</button>
+        <button class="rb" onclick="setRating('cond',4)">4</button>
+        <button class="rb" onclick="setRating('cond',5)">5</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Appearance (1–5)</label>
+      <div class="rating-row" id="r-app">
+        <button class="rb" onclick="setRating('app',1)">1</button>
+        <button class="rb" onclick="setRating('app',2)">2</button>
+        <button class="rb" onclick="setRating('app',3)">3</button>
+        <button class="rb" onclick="setRating('app',4)">4</button>
+        <button class="rb" onclick="setRating('app',5)">5</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Approach Style</label>
+      <input type="text" id="inp-opener" placeholder="e.g. Direct, Question, Indirect">
+    </div>
+    <div class="fg">
+      <label>Goal / Notes</label>
+      <textarea id="inp-goal" placeholder="Today's focus or goals"></textarea>
+    </div>
+    <button class="btn btn-p" onclick="startSession()">&#9654; Start Session</button>
+  </div>
+</div>
+
+<!-- Screen: Active -->
+<div id="scr-active" class="screen">
+  <div class="timer-bar">
+    <div>
+      <div class="timer-sub">Elapsed</div>
+      <div class="timer-val" id="timer">00:00:00</div>
+    </div>
+    <div style="text-align:right">
+      <div class="timer-sub">Approach</div>
+      <div style="font-size:30px;font-weight:800;color:#34d399" id="hdr-ap">0</div>
+    </div>
+  </div>
+  <div class="live-grid">
+    <div class="ls"><div class="ls-v" id="ls-st">0</div><div class="ls-l">Engaged</div></div>
+    <div class="ls"><div class="ls-v" id="ls-cv">0</div><div class="ls-l">Conv.</div></div>
+    <div class="ls"><div class="ls-v" id="ls-co">0</div><div class="ls-l">Contact</div></div>
+    <div class="ls"><div class="ls-v" id="ls-dt">0</div><div class="ls-l">Plan</div></div>
+    <div class="ls"><div class="ls-v" id="ls-cl">0</div><div class="ls-l">Same Day</div></div>
+    <div class="ls"><div class="ls-v" id="ls-nc">0</div><div class="ls-l">Later</div></div>
+    <div class="ls"><div class="ls-v" id="ls-rj" style="color:#f87171">0</div><div class="ls-l">Declined</div></div>
+    <div class="ls"><div class="ls-v" id="ls-io" style="color:#34d399">0</div><div class="ls-l">Outcome</div></div>
+  </div>
+  <div class="ctr-grid">
+    <button class="ctr c-ap" onclick="inc('ap')">
+      <button class="undo" onclick="event.stopPropagation();dec('ap')">&#8617;</button>
+      Approach <span class="cnum" id="c-ap">0</span>
+    </button>
+    <button class="ctr c-st" onclick="inc('st')">
+      <button class="undo" onclick="event.stopPropagation();dec('st')">&#8617;</button>
+      Engaged <span class="cnum" id="c-st">0</span>
+    </button>
+    <button class="ctr c-cv" onclick="inc('cv')">
+      <button class="undo" onclick="event.stopPropagation();dec('cv')">&#8617;</button>
+      Conversation <span class="cnum" id="c-cv">0</span>
+    </button>
+    <button class="ctr c-co" onclick="inc('co')">
+      <button class="undo" onclick="event.stopPropagation();dec('co')">&#8617;</button>
+      Contact <span class="cnum" id="c-co">0</span>
+    </button>
+    <button class="ctr c-dt" onclick="inc('dt')">
+      <button class="undo" onclick="event.stopPropagation();dec('dt')">&#8617;</button>
+      Plan <span class="cnum" id="c-dt">0</span>
+    </button>
+    <button class="ctr c-cl" onclick="inc('cl')">
+      <button class="undo" onclick="event.stopPropagation();dec('cl')">&#8617;</button>
+      Same Day <span class="cnum" id="c-cl">0</span>
+    </button>
+    <button class="ctr c-nc" onclick="inc('nc')">
+      <button class="undo" onclick="event.stopPropagation();dec('nc')">&#8617;</button>
+      Later <span class="cnum" id="c-nc">0</span>
+    </button>
+    <button class="ctr c-rj" onclick="inc('rj')">
+      <button class="undo" onclick="event.stopPropagation();dec('rj')">&#8617;</button>
+      Declined <span class="cnum" id="c-rj">0</span>
+    </button>
+  </div>
+  <div style="padding:0 12px 12px">
+    <button class="btn btn-d" onclick="endSession()">&#9632; End Session</button>
+  </div>
+</div>
+
+<!-- Screen: Log -->
+<div id="scr-log" class="screen">
+  <div class="hdr"><h1>Field Log</h1></div>
+  <div class="card">
+    <div class="card-title">Data Management</div>
+    <button class="btn btn-g" onclick="exportData()">&#11015; Export JSON</button>
+    <label class="btn btn-g" style="display:block;text-align:center;padding:15px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin:4px 0;color:#fff;background:#64748b">
+      &#11014; Import JSON
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    </label>
+    <button class="btn btn-d" onclick="clearData()" style="margin-top:2px">&#128465; Clear All Data</button>
+  </div>
+  <div id="hist-list"></div>
+</div>
+
+<!-- Screen: Stats -->
+<div id="scr-stats" class="screen">
+  <div class="hdr"><h1>Field Log</h1></div>
+  <div id="analytics-body"></div>
+</div>
+
+<!-- Screen: Follow-up -->
+<div id="scr-followup" class="screen">
+  <div class="hdr">
+    <h1>Field Log</h1>
+    <button onclick="openFollowupModal()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer">+ Later Result</button>
+  </div>
+  <div id="followup-list"></div>
+</div>
+
+<!-- Modal: KPI -->
+<div class="overlay" id="m-kpi">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle">Session Result</div>
+      <button class="mclose" onclick="closeModal('m-kpi');showScr('log')">&#215;</button>
+    </div>
+    <div id="m-kpi-body"></div>
+    <button class="btn btn-s" style="margin-top:10px" onclick="openReflection()">Add Review &#8594;</button>
+    <button class="btn btn-g" onclick="closeModal('m-kpi');showScr('log')">Close</button>
+  </div>
+</div>
+
+<!-- Modal: Review -->
+<div class="overlay" id="m-ref">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle">Review</div>
+      <button class="mclose" onclick="closeModal('m-ref');showScr('log')">&#215;</button>
+    </div>
+    <div class="fg"><label>&#9989; What went well</label><textarea id="r-good" placeholder="Successes, good moments"></textarea></div>
+    <div class="fg"><label>&#10060; What to improve</label><textarea id="r-bad" placeholder="Points to reflect on"></textarea></div>
+    <div class="fg"><label>&#129514; Try next time</label><textarea id="r-next" placeholder="Things to test next session"></textarea></div>
+    <div class="fg"><label>&#128683; Stop doing</label><textarea id="r-stop" placeholder="Habits to drop"></textarea></div>
+    <div class="fg"><label>&#128161; Notes</label><textarea id="r-memo" placeholder="Free notes"></textarea></div>
+    <button class="btn btn-s" onclick="saveRef()">Save</button>
+    <button class="btn btn-g" onclick="closeModal('m-ref');showScr('log')">Skip</button>
+  </div>
+</div>
+
+<!-- Modal: Detail -->
+<div class="overlay" id="m-detail">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle" id="m-detail-title">Details</div>
+      <button class="mclose" onclick="closeModal('m-detail')">&#215;</button>
+    </div>
+    <div id="m-detail-body"></div>
+  </div>
+</div>
+
+<!-- Modal: Outcome Record -->
+<div class="overlay" id="m-record">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle" id="m-record-title">Outcome Record</div>
+      <button class="mclose" onclick="closeModal('m-record')">&#215;</button>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Initial</label>
+        <input type="text" id="rec-initial" maxlength="2" placeholder="e.g. A, J">
+      </div>
+      <div class="fg">
+        <label>Preference (1–5)</label>
+        <div class="rating-row" id="cr-pref">
+          <button class="rb" onclick="setRecRating('pref',1)">1</button>
+          <button class="rb" onclick="setRecRating('pref',2)">2</button>
+          <button class="rb" onclick="setRecRating('pref',3)">3</button>
+          <button class="rb" onclick="setRecRating('pref',4)">4</button>
+          <button class="rb" onclick="setRecRating('pref',5)">5</button>
+        </div>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Score (1–10)</label>
+      <div class="rating-row10" id="cr-score">
+        <button class="rb10" onclick="setRecRating('score',1)">1</button>
+        <button class="rb10" onclick="setRecRating('score',2)">2</button>
+        <button class="rb10" onclick="setRecRating('score',3)">3</button>
+        <button class="rb10" onclick="setRecRating('score',4)">4</button>
+        <button class="rb10" onclick="setRecRating('score',5)">5</button>
+        <button class="rb10" onclick="setRecRating('score',6)">6</button>
+        <button class="rb10" onclick="setRecRating('score',7)">7</button>
+        <button class="rb10" onclick="setRecRating('score',8)">8</button>
+        <button class="rb10" onclick="setRecRating('score',9)">9</button>
+        <button class="rb10" onclick="setRecRating('score',10)">10</button>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Work</label>
+        <input type="text" id="rec-work" placeholder="e.g. Office, Student">
+      </div>
+      <div class="fg">
+        <label>Background</label>
+        <input type="text" id="rec-bg" placeholder="e.g. Only child">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Notes</label>
+      <textarea id="rec-notes" placeholder="Details, episode notes..."></textarea>
+    </div>
+    <button class="btn btn-s" onclick="saveRecord()">Save</button>
+    <button class="btn btn-g" onclick="closeModal('m-record')">Skip</button>
+  </div>
+</div>
+
+<!-- Modal: Later Result -->
+<div class="overlay" id="m-followup">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle">Later Result</div>
+      <button class="mclose" onclick="closeModal('m-followup')">&#215;</button>
+    </div>
+    <div class="fg">
+      <label>Original Session</label>
+      <select id="fu-orig-sess" style="font-size:14px"></select>
+    </div>
+    <div class="fg">
+      <label>Completion Date</label>
+      <input type="date" id="fu-date">
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Initial</label>
+        <input type="text" id="fu-initial" maxlength="2" placeholder="e.g. A, J">
+      </div>
+      <div class="fg">
+        <label>Preference (1–5)</label>
+        <div class="rating-row" id="fr-pref">
+          <button class="rb" onclick="setFuRating('pref',1)">1</button>
+          <button class="rb" onclick="setFuRating('pref',2)">2</button>
+          <button class="rb" onclick="setFuRating('pref',3)">3</button>
+          <button class="rb" onclick="setFuRating('pref',4)">4</button>
+          <button class="rb" onclick="setFuRating('pref',5)">5</button>
+        </div>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Score (1–10)</label>
+      <div class="rating-row10" id="fr-score">
+        <button class="rb10" onclick="setFuRating('score',1)">1</button>
+        <button class="rb10" onclick="setFuRating('score',2)">2</button>
+        <button class="rb10" onclick="setFuRating('score',3)">3</button>
+        <button class="rb10" onclick="setFuRating('score',4)">4</button>
+        <button class="rb10" onclick="setFuRating('score',5)">5</button>
+        <button class="rb10" onclick="setFuRating('score',6)">6</button>
+        <button class="rb10" onclick="setFuRating('score',7)">7</button>
+        <button class="rb10" onclick="setFuRating('score',8)">8</button>
+        <button class="rb10" onclick="setFuRating('score',9)">9</button>
+        <button class="rb10" onclick="setFuRating('score',10)">10</button>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Work</label>
+        <input type="text" id="fu-work" placeholder="e.g. Office, Student">
+      </div>
+      <div class="fg">
+        <label>Background</label>
+        <input type="text" id="fu-bg" placeholder="e.g. Only child">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Notes</label>
+      <textarea id="fu-notes" placeholder="Details..."></textarea>
+    </div>
+    <button class="btn btn-s" onclick="saveFollowup()">Save</button>
+    <button class="btn btn-g" onclick="closeModal('m-followup')">Cancel</button>
+  </div>
+</div>
+
+<nav>
+  <button id="nav-start" class="active" onclick="showScr('start')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+    Start
+  </button>
+  <button id="nav-active" onclick="showScr('active')" style="position:relative">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+    Active
+    <span id="nav-dot" class="nav-dot" style="display:none"></span>
+  </button>
+  <button id="nav-log" onclick="showScr('log')">
+    <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Log
+  </button>
+  <button id="nav-stats" onclick="showScr('stats')">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Stats
+  </button>
+  <button id="nav-followup" onclick="showScr('followup')">
+    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    Follow-up
+  </button>
+</nav>
+
+<script src="./script.js" defer></script>
+</body>
+</html>
